@@ -1435,6 +1435,42 @@ fail:
   return FALSE;
 }
 
+dbus_bool_t
+bus_connections_reload_policy (BusConnections *connections,
+                               DBusError      *error)
+{
+  BusConnectionData *d;
+  DBusConnection *connection;
+  DBusList *link;
+
+  _dbus_assert (connections != NULL);
+  _DBUS_ASSERT_ERROR_IS_CLEAR (error);
+
+  for (link = _dbus_list_get_first_link (&(connections->completed));
+       link;
+       link = _dbus_list_get_next_link (&(connections->completed), link))
+    {
+      connection = link->data;
+      d = BUS_CONNECTION_DATA (connection);
+      _dbus_assert (d != NULL);
+      _dbus_assert (d->policy != NULL);
+
+      bus_client_policy_unref (d->policy);
+      d->policy = bus_context_create_client_policy (connections->context,
+                                                    connection,
+                                                    error);
+      if (d->policy == NULL)
+        {
+          _dbus_verbose ("Failed to create security policy for connection %p\n",
+                      connection);
+          _DBUS_ASSERT_ERROR_IS_SET (error);
+          return FALSE;
+        }
+    }
+
+  return TRUE;
+}
+
 const char *
 bus_connection_get_name (DBusConnection *connection)
 {
@@ -1990,12 +2026,6 @@ bus_transaction_get_context (BusTransaction  *transaction)
   return transaction->context;
 }
 
-BusConnections*
-bus_transaction_get_connections (BusTransaction  *transaction)
-{
-  return bus_context_get_connections (transaction->context);
-}
-
 dbus_bool_t
 bus_transaction_send_from_driver (BusTransaction *transaction,
                                   DBusConnection *connection,
@@ -2126,6 +2156,16 @@ bus_transaction_send (BusTransaction *transaction,
 }
 
 static void
+transaction_free (BusTransaction *transaction)
+{
+  _dbus_assert (transaction->connections == NULL);
+
+  free_cancel_hooks (transaction);
+
+  dbus_free (transaction);
+}
+
+static void
 connection_cancel_transaction (DBusConnection *connection,
                                BusTransaction *transaction)
 {
@@ -2163,14 +2203,10 @@ bus_transaction_cancel_and_free (BusTransaction *transaction)
   while ((connection = _dbus_list_pop_first (&transaction->connections)))
     connection_cancel_transaction (connection, transaction);
 
-  _dbus_assert (transaction->connections == NULL);
-
   _dbus_list_foreach (&transaction->cancel_hooks,
                       cancel_hook_cancel, NULL);
 
-  free_cancel_hooks (transaction);
-  
-  dbus_free (transaction);
+  transaction_free (transaction);
 }
 
 static void
@@ -2224,11 +2260,7 @@ bus_transaction_execute_and_free (BusTransaction *transaction)
   while ((connection = _dbus_list_pop_first (&transaction->connections)))
     connection_execute_transaction (connection, transaction);
 
-  _dbus_assert (transaction->connections == NULL);
-
-  free_cancel_hooks (transaction);
-  
-  dbus_free (transaction);
+  transaction_free (transaction);
 }
 
 static void
