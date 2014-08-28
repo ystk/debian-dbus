@@ -42,12 +42,7 @@ agentdir=$(LAUNCHD_AGENT_DIR)
 agent_DATA=org.freedesktop.dbus-session.plist
 endif
 
-if DBUS_USE_LIBXML
-XML_SOURCES=config-loader-libxml.c
-endif
-if DBUS_USE_EXPAT
 XML_SOURCES=config-loader-expat.c
-endif
 
 if DBUS_BUS_ENABLE_KQUEUE
 DIR_WATCH_SOURCE=dir-watch-kqueue.c
@@ -55,11 +50,7 @@ else
 if DBUS_BUS_ENABLE_INOTIFY
 DIR_WATCH_SOURCE=dir-watch-inotify.c
 else
-if DBUS_BUS_ENABLE_DNOTIFY_ON_LINUX
-DIR_WATCH_SOURCE=dir-watch-dnotify.c
-else
 DIR_WATCH_SOURCE=dir-watch-default.c
-endif
 endif
 endif
 
@@ -149,15 +140,15 @@ dbus_daemon_launch_helper_test_CPPFLAGS = \
 
 ## we build yet another binary so we can do the OOM tests
 ## DO NOT INSTALL THIS FILE
-bus_test_launch_helper_SOURCES=		\
+test_bus_launch_helper_SOURCES=		\
 	test-launch-helper.c   		\
 	$(LAUNCH_HELPER_SOURCES)
 
-bus_test_launch_helper_LDADD=		\
+test_bus_launch_helper_LDADD=		\
 	$(top_builddir)/dbus/libdbus-internal.la \
 	$(DBUS_LAUNCHER_LIBS)
 
-bus_test_launch_helper_CPPFLAGS = \
+test_bus_launch_helper_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	-DACTIVATION_LAUNCHER_TEST	\
 	-DACTIVATION_LAUNCHER_DO_OOM
@@ -173,23 +164,23 @@ endif DBUS_UNIX
 ## compiled, so we don't put them in TESTS here; we run them in test/
 ## instead.
 
-if DBUS_BUILD_TESTS
+if DBUS_ENABLE_EMBEDDED_TESTS
 ## we use noinst_PROGRAMS not check_PROGRAMS so that we build
 ## even when not doing "make check"
 
 # run as a test by test/Makefile.am
-noinst_PROGRAMS += bus-test bus-test-system
+noinst_PROGRAMS += test-bus test-bus-system
 
 if DBUS_UNIX
 # run as a test by test/Makefile.am
-noinst_PROGRAMS += bus-test-launch-helper
+noinst_PROGRAMS += test-bus-launch-helper
 # this is used by the tests but is not,itself, a test
 noinst_PROGRAMS += dbus-daemon-launch-helper-test
 endif DBUS_UNIX
 
-endif DBUS_BUILD_TESTS
+endif DBUS_ENABLE_EMBEDDED_TESTS
 
-bus_test_system_SOURCES=			\
+test_bus_system_SOURCES=			\
 	$(XML_SOURCES)				\
 	config-parser-common.c			\
 	config-parser-common.h			\
@@ -199,13 +190,13 @@ bus_test_system_SOURCES=			\
 	utils.h					\
 	test-system.c
 
-bus_test_system_LDADD=$(top_builddir)/dbus/libdbus-internal.la $(DBUS_BUS_LIBS)
+test_bus_system_LDADD=$(top_builddir)/dbus/libdbus-internal.la $(DBUS_BUS_LIBS)
 
-bus_test_SOURCES=				\
+test_bus_SOURCES=				\
 	$(BUS_SOURCES)				\
 	test-main.c
 
-bus_test_LDADD=$(top_builddir)/dbus/libdbus-internal.la $(DBUS_BUS_LIBS)
+test_bus_LDADD=$(top_builddir)/dbus/libdbus-internal.la $(DBUS_BUS_LIBS)
 
 ## mop up the gcov files
 clean-local:

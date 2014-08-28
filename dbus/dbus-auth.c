@@ -2238,8 +2238,8 @@ process_command (DBusAuth *auth)
 
 /**
  * Creates a new auth conversation object for the server side.
- * See doc/dbus-sasl-profile.txt for full details on what
- * this object does.
+ * See http://dbus.freedesktop.org/doc/dbus-specification.html#auth-protocol
+ * for full details on what this object does.
  *
  * @returns the new object or #NULL if no memory
  */
@@ -2284,8 +2284,8 @@ _dbus_auth_server_new (const DBusString *guid)
 
 /**
  * Creates a new auth conversation object for the client side.
- * See doc/dbus-sasl-profile.txt for full details on what
- * this object does.
+ * See http://dbus.freedesktop.org/doc/dbus-specification.html#auth-protocol
+ * for full details on what this object does.
  *
  * @returns the new object or #NULL if no memory
  */
@@ -2533,12 +2533,10 @@ _dbus_auth_get_buffer (DBusAuth     *auth,
  *
  * @param auth the auth conversation
  * @param buffer the buffer being returned
- * @param bytes_read number of new bytes added
  */
 void
 _dbus_auth_return_buffer (DBusAuth               *auth,
-                          DBusString             *buffer,
-                          int                     bytes_read)
+                          DBusString             *buffer)
 {
   _dbus_assert (buffer == &auth->incoming);
   _dbus_assert (auth->buffer_outstanding);

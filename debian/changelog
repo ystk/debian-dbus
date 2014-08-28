@@ -1,9 +1,218 @@
-dbus (1.6.8-1+deb7u1) wheezy-security; urgency=high
+dbus (1.8.6-2) unstable; urgency=medium
 
-  * CVE-2013-2168: add patch to avoid a user-triggerable crash
-    (denial of services) in system services that use libdbus
+  * debian/dbus.posinst: When triggered only poke the dbus-daemon, don't run
+    update-rc.d/invoke-rc.d as added by dh_installinit. This prevent some
+    odd-corner when being triggered during init system upgrade
+    (Closes: #754404)
 
- -- Simon McVittie <smcv@debian.org>  Wed, 12 Jun 2013 14:03:19 +0100
+ -- Sjoerd Simons <sjoerd@debian.org>  Wed, 13 Aug 2014 22:30:38 +0200
+
+dbus (1.8.6-1) unstable; urgency=high
+
+  * New upstream release
+    - fix two local DoS vulnerabilities (CVE-2014-3532, CVE-2014-3533)
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 30 Jun 2014 15:15:58 +0100
+
+dbus (1.8.4-1) unstable; urgency=high
+
+  * New upstream release, fixing a DoS vulnerability (CVE-2014-3477)
+
+ -- Simon McVittie <smcv@debian.org>  Thu, 05 Jun 2014 15:12:02 +0100
+
+dbus (1.8.2-1) unstable; urgency=medium
+
+  * New upstream release
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 30 Apr 2014 20:17:46 +0100
+
+dbus (1.8.0-3) unstable; urgency=medium
+
+  * Improve autopkgtest support
+    - use a shell wildcard instead of dpkg-architecture, to avoid stderr spam
+      failing the test if gcc is missing
+    - wrap each test-case in an arbitrary (5 minute) timeout so that one
+      test-case failing won't halt the whole build
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 26 Mar 2014 09:17:20 +0000
+
+dbus (1.8.0-2) unstable; urgency=low
+
+  * debian/rules: look for DEB_BUILD_PROFILES, the new name for
+    DEB_BUILD_PROFILE
+  * Don't try to install systemd units in a stage1 build (they are
+    no longer installed unless libsystemd*-dev are found) (Closes: #738317)
+  * Mark dbus-1-doc with Build-Profiles: !stage1
+  * Register a dpkg trigger on /usr/share/dbus-1/system-services and
+    /etc/dbus-1/system.d that calls ReloadConfig on the system dbus-daemon,
+    in case our inotify monitoring isn't completely reliable (see #740139)
+  * Clean debian/tmp-udeb in `debian/rules clean`
+  * Hook up the installed tests to DEP-8 metadata
+  * Add a simple compile/link/run test
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 26 Feb 2014 13:15:14 +0000
+
+dbus (1.8.0-1) unstable; urgency=low
+
+  * New upstream stable release
+    - add debian/copyright stanzas for some new BSD-licensed cmake macros
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 20 Jan 2014 15:05:53 +0000
+
+dbus (1.7.10-2) unstable; urgency=low
+
+  * Conditionalize libaudit and libcap-ng build-dependencies to [linux-any]
+  * Explicitly enable libaudit, SELinux and systemd on Linux;
+    do not enable them elsewhere
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 07 Jan 2014 12:12:15 +0000
+
+dbus (1.7.10-1) unstable; urgency=low
+
+  * Merge from experimental into unstable
+  * New upstream release 1.7.10 (1.8 rc1)
+  * Generate debian/dbus.install from a generic part and a Linux-specific
+    part, since systemd metadata doesn't get installed on non-Linux any more
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 06 Jan 2014 19:43:36 +0000
+
+dbus (1.7.8-1) experimental; urgency=low
+
+  [ Laurent Bigonville ]
+  * debian/rules: Re-add udeb_configure_flags that were lost during merge
+    (Closes: #727774)
+
+  [ Simon McVittie ]
+  * Standards-Version: 3.9.5 (no changes needed)
+  * Enable libaudit support so messages that violate SELinux policy go to the
+    audit log (Closes: #727771)
+  * New upstream release
+    - add new dependency on libsystemd-journal-dev for linux-any
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 29 Oct 2013 13:07:02 +0000
+
+dbus (1.7.6-2) experimental; urgency=low
+
+  * debian/rules: FTBFS if new symbols or libraries are added
+    without updating the symbols file
+  * debian/copyright: list copyright holders and minor licenses
+    (Closes: #726000)
+  * Merge packaging changes from unstable:
+    - Run `update-rc.d dbus defaults` instead of deprecated
+      `update-rc.d dbus start ...` (Closes: #725923)
+    - Add udeb packages, so the graphical installer can use AT-SPI
+      (Closes: #723952)
+    - Standards-Version: 3.9.4 (no changes needed)
+
+ -- Simon McVittie <smcv@debian.org>  Sat, 12 Oct 2013 16:30:55 +0100
+
+dbus (1.7.6-1) experimental; urgency=low
+
+  * Standards-Version: 3.9.4 (no changes needed)
+  * New upstream development release
+    - update symbols
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 09 Oct 2013 16:44:43 +0100
+
+dbus (1.7.4-1) experimental; urgency=low
+
+  * New upstream development release
+    - CVE-2013-2168: avoid a user-triggerable crash (denial of services)
+      in system services that use libdbus
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 12 Jun 2013 19:53:00 +0100
+
+dbus (1.7.2-1) experimental; urgency=low
+
+  * New upstream development release
+  * Do the debug build --with-valgrind on mipsel, too
+
+ -- Simon McVittie <smcv@debian.org>  Thu, 25 Apr 2013 13:46:10 +0100
+
+dbus (1.7.0-1) experimental; urgency=low
+
+  * Branch for experimental
+  * New upstream development release
+  * On architectures where it's currently supported, do the
+    debug build with --with-valgrind for better instrumentation
+  * debian/rules: factor out production and debug configure flags
+  * Add support for DEB_BUILD_OPTIONS=nodocs, which omits most documentation
+    (allowing doxygen and xmlto to be avoided) and the dbus-1-doc package
+  * Add support for DEB_BUILD_PROFILE=stage1, which does the same as nodocs
+    and additionally makes the debug build not insist on building all tests
+  * Make the development and debugging packages Multi-Arch: same,
+    since their arch-dependent files are all arch-segregated
+    (/usr/lib/TUPLE) or named according to a build-ID (/usr/lib/debug)
+    (Closes: #689071). This is not actually useful until pkg-config
+    becomes M-A: foreign (#631275).
+
+ -- Simon McVittie <smcv@debian.org>  Fri, 22 Feb 2013 15:20:10 +0000
+
+dbus (1.6.18-2) unstable; urgency=medium
+
+  * Disable valgrind integration in the debug build on armel,
+    since valgrind no longer supports armel (Closes: #729136)
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 02 Dec 2013 10:22:39 +0000
+
+dbus (1.6.18-1) unstable; urgency=low
+
+  * Run `update-rc.d dbus defaults` instead of deprecated
+    `update-rc.d dbus start ...` (Closes: #725923)
+  * debian/rules: FTBFS if new symbols or libraries are added
+    without updating the symbols file
+  * debian/copyright: list copyright holders and minor licenses
+    (Closes: #726000)
+  * New upstream release 1.6.18
+  * Standards-Version: 3.9.5 (no changes needed)
+
+ -- Simon McVittie <smcv@debian.org>  Fri, 01 Nov 2013 16:30:33 +0000
+
+dbus (1.6.16-1) unstable; urgency=low
+
+  * New upstream stable release 1.6.16
+  * Backport the new dbus-run-session tool from D-Bus 1.7
+  * Add udeb packages, so the graphical installer can use AT-SPI
+    (Closes: #723952)
+  * Standards-Version: 3.9.4 (no changes needed)
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 08 Oct 2013 16:44:21 +0100
+
+dbus (1.6.14-1) unstable; urgency=low
+
+  * New upstream stable release 1.6.14
+    - fixes an infinite busy-loop if waitpid() is interrupted by a signal
+      while spawning a subprocess (Closes: #721932)
+
+ -- Simon McVittie <smcv@debian.org>  Thu, 05 Sep 2013 16:42:55 +0100
+
+dbus (1.6.12-1) unstable; urgency=high
+
+  * New upstream stable release 1.6.12
+    - CVE-2013-2168: avoid a user-triggerable crash (denial of services)
+      in system services that use libdbus
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 12 Jun 2013 14:38:34 +0100
+
+dbus (1.6.10-1) unstable; urgency=low
+
+  * New upstream stable release 1.6.10
+  * Merge everything except the upstream development release from experimental:
+    - On architectures where it's currently supported, do the
+      debug build with --with-valgrind for better instrumentation
+    - debian/rules: factor out production and debug configure flags
+    - Add support for DEB_BUILD_OPTIONS=nodocs, which omits most documentation
+      (allowing doxygen and xmlto to be avoided) and the dbus-1-doc package
+    - Add support for DEB_BUILD_PROFILE=stage1, which does the same as nodocs
+      and additionally makes the debug build not insist on building all tests
+    - Make the development and debugging packages Multi-Arch: same,
+      since their arch-dependent files are all arch-segregated
+      (/usr/lib/TUPLE) or named according to a build-ID (/usr/lib/debug)
+      (Closes: #689071). This is not actually useful until pkg-config
+      becomes M-A: foreign (#631275).
+  * Do the debug build --with-valgrind on mipsel, too
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 08 May 2013 10:52:51 +0100
 
 dbus (1.6.8-1) unstable; urgency=low
 
