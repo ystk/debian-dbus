@@ -3,3 +3,11 @@
 10_dbus-1.0.1-generate-xml-docs.patch
 11-589662-reload-kqueue.patch
 12-CVE-2010-4352-reject-deeply-nested-variants.patch
+13-629938-_dbus_header_byteswap.patch
+0001-CVE-2012-3524-Don-t-access-environment-variables-or-.patch
+0002-hardening-Ensure-_dbus_check_setuid-is-initialized-t.patch
+0003-hardening-Remove-activation-helper-handling-for-DBUS.patch
+0004-activation-helper-Ensure-DBUS_STARTER_ADDRESS-is-set.patch
+CVE-2014-3638.patch
+CVE-2014-3639.patch
+CVE-2014-3477.patch

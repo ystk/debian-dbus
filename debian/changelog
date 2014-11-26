@@ -1,3 +1,40 @@
+dbus (1.2.24-4+squeeze3) squeeze-lts; urgency=medium
+
+  * Security upload by the Debian LTS team.
+  * CVE-2014-3477: Backport patch from upstream to fix a denial of service
+    (failure to obtain bus name) in newly-activated system services that not
+    all users are allowed to access.
+  * CVE-2014-3638: Backport patch from upstream to reduce maximum number of
+    pending replies per connection to avoid algorithmic complexity DoS.
+  * CVE-2014-3639: Backport patch from upstream to not accept() new
+    connections when all unauthenticated connection slots are in use,
+    so that malicious processes cannot prevent new connections to the
+    system bus. Note that the patch that reduced the authentication delay
+    to 5s has not been applied due to known regressions:
+    https://bugs.freedesktop.org/show_bug.cgi?id=86431
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Wed, 19 Nov 2014 15:12:37 +0100
+
+dbus (1.2.24-4+squeeze2) stable; urgency=low
+
+  * CVE-2012-3524: apply patches from upstream 1.6.6 to avoid arbitrary
+    code execution in setuid/setgid binaries that incorrectly use libdbus
+    without first sanitizing the environment variables inherited from
+    their less-privileged caller (Closes: #689070).
+    - As per upstream 1.6.8, do not check filesystem capabilities for now,
+      only setuid/setgid, fixing regressions in certain configurations of
+      gnome-keyring
+
+ -- Simon McVittie <smcv@debian.org>  Thu, 04 Oct 2012 08:47:10 +0100
+
+dbus (1.2.24-4+squeeze1) stable; urgency=low
+
+  * Update Vcs-* control fields to reflect the move to git
+  * Apply patch to fix CVE-2011-2200 (fd.o #38120), which is a local DoS for
+    system services (Closes: #629938)
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 14 Jun 2011 19:45:00 +0100
+
 dbus (1.2.24-4) unstable; urgency=high
 
   * debian/patches/12-CVE-2010-4352-reject-deeply-nested-variants.patch

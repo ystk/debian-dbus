@@ -1,0 +1,36 @@
+From: Colin Walters <walters@verbum.org>
+Date: Thu, 27 Sep 2012 21:35:22 -0400
+Subject: [PATCH 2/5] hardening: Ensure _dbus_check_setuid() is initialized
+ threadsafe manner
+
+This is a highly theoretical concern, but we might as well.
+
+https://bugs.freedesktop.org/show_bug.cgi?id=52202
+
+Origin: upstream, 1.2.30, commit:f7b2ec1b2e39318766938b53511311a0d0a71680
+Bug: https://bugs.freedesktop.org/show_bug.cgi?id=52202
+Bug-CVE: related to CVE-2012-3524
+Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=689070
+---
+ dbus/dbus-sysdeps-pthread.c |    5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/dbus/dbus-sysdeps-pthread.c b/dbus/dbus-sysdeps-pthread.c
+index 46e4204..f21af85 100644
+--- a/dbus/dbus-sysdeps-pthread.c
++++ b/dbus/dbus-sysdeps-pthread.c
+@@ -358,6 +358,11 @@ check_monotonic_clock (void)
+ dbus_bool_t
+ _dbus_threads_init_platform_specific (void)
+ {
++  /* These have static variables, and we need to handle both the case
++   * where dbus_threads_init() has been called and when it hasn't;
++   * so initialize them before any threads are allowed to enter.
++   */
+   check_monotonic_clock ();
++  (void) _dbus_check_setuid ();
+   return dbus_threads_init (&pthread_functions);
+ }
+-- 
+1.7.10.4
+

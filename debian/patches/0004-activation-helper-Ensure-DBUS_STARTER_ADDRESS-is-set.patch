@@ -1,0 +1,66 @@
+From: Geoffrey Thomas <gthomas@mokafive.com>
+Date: Thu, 27 Sep 2012 22:02:06 -0700
+Subject: [PATCH 4/5] activation-helper: Ensure DBUS_STARTER_ADDRESS is set
+ correctly
+
+The fix for CVE-2012-3524 filters out all environment variables if
+libdbus is used from a setuid program, to prevent various spoofing
+attacks.
+
+Unfortunately, the activation helper is a setuid program linking
+libdbus, and this creates a regression for launched programs using
+DBUS_STARTER_ADDRESS, since it will no longer exist.
+
+Fix this by hardcoding the starter address to the default system bus
+address.
+
+Signed-off-by: Geoffrey Thomas <gthomas@mokafive.com>
+Signed-off-by: Colin Walters <walters@verbum.org>
+Origin: upstream, 1.2.30, commit:c5c747dd7613d777a05ddb663409eeea4e61ec74
+Bug: https://bugs.freedesktop.org/show_bug.cgi?id=52202
+Bug-CVE: related to CVE-2012-3524
+Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=689070
+---
+ bus/activation-helper.c |   16 +++++-----------
+ 1 file changed, 5 insertions(+), 11 deletions(-)
+
+diff --git a/bus/activation-helper.c b/bus/activation-helper.c
+index bc5ed07..bfe832e 100644
+--- a/bus/activation-helper.c
++++ b/bus/activation-helper.c
+@@ -140,15 +140,12 @@ out_all:
+   return desktop_file;
+ }
+ 
+-/* Clears the environment, except for DBUS_STARTER_x */
++/* Clears the environment, except for DBUS_STARTER_x,
++ * which we hardcode to the system bus.
++ */
+ static dbus_bool_t
+ clear_environment (DBusError *error)
+ {
+-  const char *starter_env = NULL;
+-
+-  /* we save the starter */
+-  starter_env = _dbus_getenv ("DBUS_STARTER_ADDRESS");
+-
+ #ifndef ACTIVATION_LAUNCHER_TEST
+   /* totally clear the environment */
+   if (!_dbus_clearenv ())
+@@ -159,11 +156,8 @@ clear_environment (DBusError *error)
+     }
+ #endif
+ 
+-  /* restore the starter */
+-  if (starter_env)
+-    _dbus_setenv ("DBUS_STARTER_ADDRESS", starter_env);
+-
+-  /* set the type, which must be system if we got this far */
++  /* Ensure the bus is set to system */
++  _dbus_setenv ("DBUS_STARTER_ADDRESS", DBUS_SYSTEM_BUS_DEFAULT_ADDRESS);
+   _dbus_setenv ("DBUS_STARTER_BUS_TYPE", "system");
+ 
+   return TRUE;
+-- 
+1.7.10.4
+

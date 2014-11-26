@@ -1,0 +1,57 @@
+From: Colin Walters <walters@verbum.org>
+Date: Fri, 28 Sep 2012 12:01:56 -0400
+Subject: [PATCH 3/5] hardening: Remove activation helper handling for
+ DBUS_VERBOSE
+
+It's not really useful.
+
+See https://bugs.freedesktop.org/show_bug.cgi?id=52202#c17
+
+Origin: upstream, 1.2.30, commit:b3800b7a666fcefc37eeb25a030241d5809a7246
+Bug: https://bugs.freedesktop.org/show_bug.cgi?id=52202
+Bug-CVE: related to CVE-2012-3524
+Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=689070
+---
+ bus/activation-helper.c |   14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
+
+diff --git a/bus/activation-helper.c b/bus/activation-helper.c
+index baba8f0..bc5ed07 100644
+--- a/bus/activation-helper.c
++++ b/bus/activation-helper.c
+@@ -140,18 +140,12 @@ out_all:
+   return desktop_file;
+ }
+ 
+-/* Cleares the environment, except for DBUS_VERBOSE and DBUS_STARTER_x */
++/* Clears the environment, except for DBUS_STARTER_x */
+ static dbus_bool_t
+ clear_environment (DBusError *error)
+ {
+-  const char *debug_env = NULL;
+   const char *starter_env = NULL;
+ 
+-#ifdef DBUS_ENABLE_VERBOSE_MODE
+-  /* are we debugging */
+-  debug_env = _dbus_getenv ("DBUS_VERBOSE");
+-#endif
+-
+   /* we save the starter */
+   starter_env = _dbus_getenv ("DBUS_STARTER_ADDRESS");
+ 
+@@ -165,12 +159,6 @@ clear_environment (DBusError *error)
+     }
+ #endif
+ 
+-#ifdef DBUS_ENABLE_VERBOSE_MODE
+-  /* restore the debugging environment setting if set */
+-  if (debug_env)
+-    _dbus_setenv ("DBUS_VERBOSE", debug_env);
+-#endif
+-
+   /* restore the starter */
+   if (starter_env)
+     _dbus_setenv ("DBUS_STARTER_ADDRESS", starter_env);
+-- 
+1.7.10.4
+
