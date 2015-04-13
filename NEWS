@@ -1,3 +1,157 @@
+D-Bus 1.8.16 (2015-02-09)
+==
+
+The “poorly concealed wrestlers” release.
+
+Security fixes:
+
+• Do not allow non-uid-0 processes to send forged ActivationFailure
+  messages. On Linux systems with systemd activation, this would
+  allow a local denial of service: unprivileged processes could
+  flood the bus with these forged messages, winning the race with
+  the actual service activation and causing an error reply
+  to be sent back when service auto-activation was requested.
+  This does not prevent the real service from being started,
+  so it only works while the real service is not running.
+  (CVE-2015-0245, fd.o #88811; Simon McVittie)
+
+Other fixes:
+
+• fix a Windows build failure (fd.o #88009, Ralf Habacker)
+
+• on Windows, allow up to 8K connections to the dbus-daemon instead of the
+  previous 64, completing a previous fix which only worked under
+  Autotools (fd.o #71297, Ralf Habacker)
+
+D-Bus 1.8.14 (2015-01-05)
+==
+
+The “40lb of roofing nails” release.
+
+Security hardening:
+
+• Do not allow calls to UpdateActivationEnvironment from uids other than
+  the uid of the dbus-daemon. If a system service installs unsafe
+  security policy rules that allow arbitrary method calls
+  (such as CVE-2014-8148) then this prevents memory consumption and
+  possible privilege escalation via UpdateActivationEnvironment.
+
+  We believe that in practice, privilege escalation here is avoided
+  by dbus-daemon-launch-helper sanitizing its environment; but
+  it seems better to be safe.
+
+• Do not allow calls to UpdateActivationEnvironment or the Stats interface
+  on object paths other than /org/freedesktop/DBus. Some system services
+  install unsafe security policy rules that allow arbitrary method calls
+  to any destination, method and interface with a specified object path;
+  while less bad than allowing arbitrary method calls, these security
+  policies are still harmful, since dbus-daemon normally offers the
+  same API on all object paths and other system services might behave
+  similarly.
+
+Other fixes:
+
+• Add missing initialization so GetExtendedTcpTable doesn't crash on
+  Windows Vista SP0 (fd.o #77008, Илья А. Ткаченко)
+
+D-Bus 1.8.12 (2014-11-24)
+==
+
+The “days of fuchsia passed” release.
+
+Fixes:
+
+• Partially revert the CVE-2014-3639 patch by increasing the default
+  authentication timeout on the system bus from 5 seconds back to 30
+  seconds, since this has been reported to cause boot regressions for
+  some users, mostly with parallel boot (systemd) on slower hardware.
+
+  On fast systems where local users are considered particularly hostile,
+  administrators can return to the 5 second timeout (or any other value
+  in milliseconds) by saving this as /etc/dbus-1/system-local.conf:
+
+  <busconfig>
+    <limit name="auth_timeout">5000</limit>
+  </busconfig>
+
+  (fd.o #86431, Simon McVittie)
+
+• Add a message in syslog/the Journal when the auth_timeout is exceeded
+  (fd.o #86431, Simon McVittie)
+
+• Send back an AccessDenied error if the addressed recipient is not allowed
+  to receive a message (and in builds with assertions enabled, don't
+  assert under the same conditions). (fd.o #86194, Jacek Bukarewicz)
+
+D-Bus 1.8.10 (2014-11-10)
+==
+
+The “tenants with a leaking roof get priority” release.
+
+Security fixes:
+
+• Increase dbus-daemon's RLIMIT_NOFILE rlimit to 65536
+  so that CVE-2014-3636 part A cannot exhaust the system bus'
+  file descriptors, completing the incomplete fix in 1.8.8.
+  (CVE-2014-7824, fd.o #85105; Simon McVittie, Alban Crequy)
+
+D-Bus 1.8.8 (2014-09-16)
+==
+
+The "smashy smashy egg man" release.
+
+Security fixes:
+
+• Do not accept an extra fd in the padding of a cmsg message, which
+  could lead to a 4-byte heap buffer overrun.
+  (CVE-2014-3635, fd.o #83622; Simon McVittie)
+
+• Reduce default for maximum Unix file descriptors passed per message
+  from 1024 to 16, preventing a uid with the default maximum number of
+  connections from exhausting the system bus' file descriptors under
+  Linux's default rlimit. Distributors or system administrators with a
+  more restrictive fd limit may wish to reduce these limits further.
+
+  Additionally, on Linux this prevents a second denial of service
+  in which the dbus-daemon can be made to exceed the maximum number
+  of fds per sendmsg() and disconnect the process that would have
+  received them.
+  (CVE-2014-3636, fd.o #82820; Alban Crequy)
+
+• Disconnect connections that still have a fd pending unmarshalling after
+  a new configurable limit, pending_fd_timeout (defaulting to 150 seconds),
+  removing the possibility of creating an abusive connection that cannot be
+  disconnected by setting up a circular reference to a connection's
+  file descriptor.
+  (CVE-2014-3637, fd.o #80559; Alban Crequy)
+
+• Reduce default for maximum pending replies per connection from 8192 to 128,
+  mitigating an algorithmic complexity denial-of-service attack
+  (CVE-2014-3638, fd.o #81053; Alban Crequy)
+
+• Reduce default for authentication timeout on the system bus from
+  30 seconds to 5 seconds, avoiding denial of service by using up
+  all unauthenticated connection slots; and when all unauthenticated
+  connection slots are used up, make new connection attempts block
+  instead of disconnecting them.
+  (CVE-2014-3639, fd.o #80919; Alban Crequy)
+
+Other fixes:
+
+• Check for libsystemd from systemd >= 209, falling back to
+  the older separate libraries if not found (Umut Tezduyar Lindskog,
+  Simon McVittie)
+
+• On Linux, use prctl() to disable core dumps from a test executable
+  that deliberately raises SIGSEGV to test dbus-daemon's handling
+  of that condition (fd.o #83772, Simon McVittie)
+
+• Fix compilation with --enable-stats (fd.o #81043, Gentoo #507232;
+  Alban Crequy)
+
+• Improve documentation for running tests on Windows (fd.o #41252,
+  Ralf Habacker)
+
 D-Bus 1.8.6 (2014-06-02)
 ==
 

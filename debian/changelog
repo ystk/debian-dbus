@@ -1,3 +1,128 @@
+dbus (1.8.16-1) unstable; urgency=high
+
+  * New upstream release fixes a local denial of service
+    when using systemd activation (CVE-2015-0245)
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 04 Feb 2015 20:14:46 +0000
+
+dbus (1.8.14-2) unstable; urgency=high
+
+  * Relax the triggers from interest to interest-noawait (Closes: #771989;
+    mitigates: #776063; partially reopens: #740139).
+
+    This is not strictly correct, because the purpose of the triggers
+    is to set up the .conf, .service files for system services before those
+    services satisfy dependencies. However, it mitigates #776063
+    (apt getting into a stuck state during upgrades), and should in
+    principle be redundant anyway, because dbus-daemon is meant to use
+    inotify to keep up with configuration changes. See #771989, #776063
+    for details.
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 03 Feb 2015 17:28:12 +0000
+
+dbus (1.8.14-1) unstable; urgency=medium
+
+  * New upstream release to harden dbus-daemon against packages that install
+    unsafe security policy configurations.
+
+ -- Simon McVittie <smcv@debian.org>  Thu, 01 Jan 2015 13:07:23 +0000
+
+dbus (1.8.12-3) unstable; urgency=medium
+
+  * preinst: partially revert change from 1.8.12-2. It seems that the
+    preinst is too late to add a useful dpkg-statoverride entry: dpkg has
+    already loaded the statoverride database by this point, and if we add
+    the entry in the preinst, dpkg-statoverride won't run and have
+    its --update side-effect in the postinst. (Closes: #773107, #773838)
+  * postinst: don't run dpkg-statoverride with 2>/dev/null: in the unlikely
+    event that it fails for a reason other than "not overridden" (which
+    results in silently exiting 1), we'll want to know about it.
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 23 Dec 2014 21:21:20 +0000
+
+dbus (1.8.12-2) unstable; urgency=medium
+
+  * postinst: use dpkg-statoverride to set the permissions for
+    dbus-daemon-launch-helper (expected to be 04754 root:messagebus)
+    as suggested in Policy §10.9. This avoids a temporarily broken state
+    when an upgraded dbus is unpacked but not yet configured (Closes: #773107)
+  * preinst: opportunistically set up the same dpkg-statoverride entry
+    if the group already exists, to avoid the same broken state during
+    upgrades from older versions without needing Pre-Depends: adduser
+  * postrm: delete the dpkg-statoverride entry on purge
+
+ -- Simon McVittie <smcv@debian.org>  Sun, 21 Dec 2014 15:02:22 +0000
+
+dbus (1.8.12-1) unstable; urgency=medium
+
+  * New upstream release 1.8.12
+    - increase auth_timeout from 5 seconds back to 30 seconds since it
+      appears to cause slow or failed boot on some systems, reverting a
+      change in 1.8.8 (Closes: #769069)
+    - add a README.Debian to the dbus package documenting how
+      sysadmins with hostile local users can get the lower timeout back,
+      if their systems are fast enough to boot correctly like that
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 24 Nov 2014 13:46:01 +0000
+
+dbus (1.8.10-1) unstable; urgency=medium
+
+  * New upstream release 1.8.10
+    - raise dbus-daemon's file descriptor limit to 65536 to avoid an
+      opportunity for denial of service
+      (CVE-2014-7824, an incomplete fix for CVE-2014-3636)
+  * Start 'dbus-daemon --system' as root under sysvinit (it already
+    starts as root under systemd), so it can increase its file
+    descriptor limit
+
+ -- Simon McVittie <smcv@debian.org>  Thu, 06 Nov 2014 16:28:22 +0000
+
+dbus (1.8.8-2) unstable; urgency=medium
+
+  [ Michael Biebl ]
+  * Build against libsystemd-dev. In systemd v209 the various libraries were
+    merged into a single libsystemd library.
+
+  [ Simon McVittie ]
+  * debian/dbus.bug-control: when people report bugs against dbus,
+    also report the status of systemd and systemd-sysv (because
+    those alter how system service activation works), and dbus-x11
+    (because that's responsible for normal session bus setup)
+  * Remove Build-Profiles control field until the syntax settles down
+    (Closes: #764222)
+  * Use --with-valgrind=auto (supported since 1.7.6) for the debug build
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 06 Oct 2014 19:17:04 +0100
+
+dbus (1.8.8-1) unstable; urgency=medium
+
+  [ Michael Biebl ]
+  * Don't attempt config reload if dbus system bus is not running.
+
+  [ Simon McVittie ]
+  * Bump dbus up to Priority: standard because without it, systemd-logind
+    does not run a getty on tty2..tty6 (matching ftp-master action in
+    #759293)
+  * New upstream release fixes several security issues
+    - CVE-2014-3635: do not accept an extra fd in cmsg padding,
+      avoiding a buffer overrun in dbus-daemon or system services
+    - CVE-2014-3636: reduce maximum number of file descriptors
+       per message from 1024 to 16, to avoid two separate denial-of-service
+       attacks that could cause system services to be dropped from the bus
+    - CVE-2014-3637: time out connections that have a
+       partially-sent message containing a file descriptor, so that
+       malicious processes cannot use self-referential file descriptors
+       to make a connection that will never close
+    - CVE-2014-3638: reduce maximum number of pending replies
+      per connection to avoid algorithmic complexity DoS
+    - CVE-2014-3639: reduce timeout for authentication and
+      do not accept() new connections when all unauthenticated connection
+      slots are in use, so that malicious processes cannot prevent new
+      connections to the system bus
+  * debian/copyright: fix glob syntax, .[ch] is not supported
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 15 Sep 2014 12:58:25 +0100
+
 dbus (1.8.6-2) unstable; urgency=medium
 
   * debian/dbus.posinst: When triggered only poke the dbus-daemon, don't run
