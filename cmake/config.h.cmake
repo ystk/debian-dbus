@@ -82,8 +82,6 @@
 # define DBUS_ENABLE_X11_AUTOLAUNCH 1
 #endif
 
-#define DBUS_DEFAULT_MESSAGE_UNIX_FDS @DEFAULT_MESSAGE_UNIX_FDS@
-
 #define _DBUS_VA_COPY_ASSIGN(a1,a2) { a1 = a2; }
 
 #cmakedefine DBUS_VA_COPY_FUNC
@@ -248,6 +246,10 @@
 
 # if defined(_MSC_VER) && !defined(inline)
 #define inline __inline
+#endif
+
+#ifdef DBUS_WIN
+#define FD_SETSIZE @FD_SETSIZE@
 #endif
 
 #endif  // _DBUS_CONFIG_H
