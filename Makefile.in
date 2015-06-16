@@ -123,8 +123,8 @@ DIST_COMMON = $(srcdir)/tools/lcov.am INSTALL NEWS README AUTHORS \
 	$(top_srcdir)/test/data/invalid-service-files-system/org.freedesktop.DBus.TestSuiteNoExec.service.in \
 	$(top_srcdir)/test/data/invalid-service-files-system/org.freedesktop.DBus.TestSuiteNoUser.service.in \
 	$(top_srcdir)/test/data/invalid-service-files-system/org.freedesktop.DBus.TestSuiteNoService.service.in \
-	COPYING compile config.guess config.sub install-sh missing \
-	ltmain.sh
+	COPYING compile config.guess config.sub depcomp install-sh \
+	missing ltmain.sh
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/as-ac-expand.m4 \
@@ -328,6 +328,7 @@ DBUS_PATH_OR_ABSTRACT = @DBUS_PATH_OR_ABSTRACT@
 DBUS_PREFIX = @DBUS_PREFIX@
 DBUS_SESSION_BUS_CONNECT_ADDRESS = @DBUS_SESSION_BUS_CONNECT_ADDRESS@
 DBUS_SESSION_BUS_LISTEN_ADDRESS = @DBUS_SESSION_BUS_LISTEN_ADDRESS@
+DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL = @DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL@
 DBUS_SESSION_SOCKET_DIR = @DBUS_SESSION_SOCKET_DIR@
 DBUS_STATIC_BUILD_CPPFLAGS = @DBUS_STATIC_BUILD_CPPFLAGS@
 DBUS_SYSTEM_BUS_DEFAULT_ADDRESS = @DBUS_SYSTEM_BUS_DEFAULT_ADDRESS@

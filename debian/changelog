@@ -1,3 +1,14 @@
+dbus (1.8.18-0+deb8u1) jessie; urgency=medium
+
+  * New upstream bugfix release
+    - Hardening: lock down the session bus to only allow EXTERNAL auth by
+      default, the same as the system bus. This avoids allowing
+      DBUS_COOKIE_SHA1, which can end up using a predictable random source
+      on systems where /dev/urandom is unavailable or dbus-daemon runs out
+      of memory. See the upstream NEWS for more details.
+
+ -- Simon McVittie <smcv@debian.org>  Thu, 14 May 2015 13:52:50 +0100
+
 dbus (1.8.16-1) unstable; urgency=high
 
   * New upstream release fixes a local denial of service
