@@ -169,7 +169,7 @@ libdbus_testutils_la_OBJECTS = $(am_libdbus_testutils_la_OBJECTS)
 am__EXEEXT_3 = test-shell$(EXEEXT) test-printf$(EXEEXT) \
 	$(am__EXEEXT_2)
 @DBUS_WITH_GLIB_TRUE@am__EXEEXT_4 = manual-authz$(EXEEXT)
-am__EXEEXT_5 = $(am__EXEEXT_4)
+am__EXEEXT_5 = manual-tcp$(EXEEXT) $(am__EXEEXT_4)
 @DBUS_ENABLE_INSTALLED_TESTS_FALSE@@DBUS_ENABLE_MODULAR_TESTS_TRUE@am__EXEEXT_6 = $(am__EXEEXT_3) \
 @DBUS_ENABLE_INSTALLED_TESTS_FALSE@@DBUS_ENABLE_MODULAR_TESTS_TRUE@	$(am__EXEEXT_5)
 @DBUS_ENABLE_INSTALLED_TESTS_TRUE@@DBUS_ENABLE_MODULAR_TESTS_TRUE@am__EXEEXT_7 = $(am__EXEEXT_3) \
@@ -180,6 +180,9 @@ am_manual_authz_OBJECTS = manual_authz-manual-authz.$(OBJEXT)
 manual_authz_OBJECTS = $(am_manual_authz_OBJECTS)
 manual_authz_DEPENDENCIES = $(testutils_shared_if_possible_libs) \
 	$(am__DEPENDENCIES_1)
+am_manual_tcp_OBJECTS = manual_tcp-manual-tcp.$(OBJEXT)
+manual_tcp_OBJECTS = $(am_manual_tcp_OBJECTS)
+manual_tcp_DEPENDENCIES = $(top_builddir)/dbus/libdbus-internal.la
 am_test_corrupt_OBJECTS = test_corrupt-corrupt.$(OBJEXT)
 test_corrupt_OBJECTS = $(am_test_corrupt_OBJECTS)
 test_corrupt_DEPENDENCIES = $(testutils_shared_if_possible_libs) \
@@ -282,7 +285,8 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(libdbus_testutils_internal_la_SOURCES) \
 	$(libdbus_testutils_la_SOURCES) $(manual_authz_SOURCES) \
-	$(test_corrupt_SOURCES) $(test_dbus_daemon_SOURCES) \
+	$(manual_tcp_SOURCES) $(test_corrupt_SOURCES) \
+	$(test_dbus_daemon_SOURCES) \
 	$(test_dbus_daemon_eavesdrop_SOURCES) test-exit.c \
 	$(test_loopback_SOURCES) $(test_marshal_SOURCES) test-names.c \
 	$(test_printf_SOURCES) $(test_refs_SOURCES) \
@@ -292,8 +296,8 @@ SOURCES = $(libdbus_testutils_internal_la_SOURCES) \
 	$(test_syntax_SOURCES) $(test_syslog_SOURCES)
 DIST_SOURCES = $(libdbus_testutils_internal_la_SOURCES) \
 	$(am__libdbus_testutils_la_SOURCES_DIST) \
-	$(manual_authz_SOURCES) $(test_corrupt_SOURCES) \
-	$(test_dbus_daemon_SOURCES) \
+	$(manual_authz_SOURCES) $(manual_tcp_SOURCES) \
+	$(test_corrupt_SOURCES) $(test_dbus_daemon_SOURCES) \
 	$(test_dbus_daemon_eavesdrop_SOURCES) test-exit.c \
 	$(test_loopback_SOURCES) $(test_marshal_SOURCES) test-names.c \
 	$(test_printf_SOURCES) $(test_refs_SOURCES) \
@@ -612,6 +616,7 @@ DBUS_PATH_OR_ABSTRACT = @DBUS_PATH_OR_ABSTRACT@
 DBUS_PREFIX = @DBUS_PREFIX@
 DBUS_SESSION_BUS_CONNECT_ADDRESS = @DBUS_SESSION_BUS_CONNECT_ADDRESS@
 DBUS_SESSION_BUS_LISTEN_ADDRESS = @DBUS_SESSION_BUS_LISTEN_ADDRESS@
+DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL = @DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL@
 DBUS_SESSION_SOCKET_DIR = @DBUS_SESSION_SOCKET_DIR@
 DBUS_STATIC_BUILD_CPPFLAGS = @DBUS_STATIC_BUILD_CPPFLAGS@
 DBUS_SYSTEM_BUS_DEFAULT_ADDRESS = @DBUS_SYSTEM_BUS_DEFAULT_ADDRESS@
@@ -860,10 +865,13 @@ test_refs_LDADD = libdbus-testutils-internal.la $(GLIB_LIBS)
 test_syslog_SOURCES = internals/syslog.c
 test_syslog_CPPFLAGS = $(static_cppflags)
 test_syslog_LDADD = libdbus-testutils-internal.la $(GLIB_LIBS)
+manual_tcp_SOURCES = manual-tcp.c
+manual_tcp_CPPFLAGS = $(static_cppflags)
+manual_tcp_LDADD = $(top_builddir)/dbus/libdbus-internal.la
 EXTRA_DIST = dbus-test-runner $(in_data) $(static_data)
 testexecdir = $(libdir)/dbus-1.0/test
 installable_tests = test-shell test-printf $(NULL) $(am__append_3)
-installable_manual_tests = $(NULL) $(am__append_4)
+installable_manual_tests = manual-tcp $(NULL) $(am__append_4)
 installcheck_tests = $(am__append_6)
 installcheck_environment = \
 	XDG_RUNTIME_DIR=@abs_top_builddir@/test/XDG_RUNTIME_DIR \
@@ -1148,6 +1156,10 @@ manual-authz$(EXEEXT): $(manual_authz_OBJECTS) $(manual_authz_DEPENDENCIES) $(EX
 	@rm -f manual-authz$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(manual_authz_OBJECTS) $(manual_authz_LDADD) $(LIBS)
 
+manual-tcp$(EXEEXT): $(manual_tcp_OBJECTS) $(manual_tcp_DEPENDENCIES) $(EXTRA_manual_tcp_DEPENDENCIES) 
+	@rm -f manual-tcp$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(manual_tcp_OBJECTS) $(manual_tcp_LDADD) $(LIBS)
+
 test-corrupt$(EXEEXT): $(test_corrupt_OBJECTS) $(test_corrupt_DEPENDENCIES) $(EXTRA_test_corrupt_DEPENDENCIES) 
 	@rm -f test-corrupt$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_corrupt_OBJECTS) $(test_corrupt_LDADD) $(LIBS)
@@ -1228,6 +1240,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdbus_testutils_internal_la-test-utils.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/manual_authz-manual-authz.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/manual_tcp-manual-tcp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/marshal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/syntax.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test-exit.Po@am__quote@
@@ -1289,6 +1302,20 @@ manual_authz-manual-authz.obj: manual-authz.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='manual-authz.c' object='manual_authz-manual-authz.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(manual_authz_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o manual_authz-manual-authz.obj `if test -f 'manual-authz.c'; then $(CYGPATH_W) 'manual-authz.c'; else $(CYGPATH_W) '$(srcdir)/manual-authz.c'; fi`
+
+manual_tcp-manual-tcp.o: manual-tcp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(manual_tcp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT manual_tcp-manual-tcp.o -MD -MP -MF $(DEPDIR)/manual_tcp-manual-tcp.Tpo -c -o manual_tcp-manual-tcp.o `test -f 'manual-tcp.c' || echo '$(srcdir)/'`manual-tcp.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/manual_tcp-manual-tcp.Tpo $(DEPDIR)/manual_tcp-manual-tcp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='manual-tcp.c' object='manual_tcp-manual-tcp.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(manual_tcp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o manual_tcp-manual-tcp.o `test -f 'manual-tcp.c' || echo '$(srcdir)/'`manual-tcp.c
+
+manual_tcp-manual-tcp.obj: manual-tcp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(manual_tcp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT manual_tcp-manual-tcp.obj -MD -MP -MF $(DEPDIR)/manual_tcp-manual-tcp.Tpo -c -o manual_tcp-manual-tcp.obj `if test -f 'manual-tcp.c'; then $(CYGPATH_W) 'manual-tcp.c'; else $(CYGPATH_W) '$(srcdir)/manual-tcp.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/manual_tcp-manual-tcp.Tpo $(DEPDIR)/manual_tcp-manual-tcp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='manual-tcp.c' object='manual_tcp-manual-tcp.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(manual_tcp_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o manual_tcp-manual-tcp.obj `if test -f 'manual-tcp.c'; then $(CYGPATH_W) 'manual-tcp.c'; else $(CYGPATH_W) '$(srcdir)/manual-tcp.c'; fi`
 
 test_corrupt-corrupt.o: corrupt.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_corrupt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_corrupt-corrupt.o -MD -MP -MF $(DEPDIR)/test_corrupt-corrupt.Tpo -c -o test_corrupt-corrupt.o `test -f 'corrupt.c' || echo '$(srcdir)/'`corrupt.c
