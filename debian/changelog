@@ -1,3 +1,14 @@
+dbus (1.8.22-0+deb8u1) jessie; urgency=medium
+
+  * New upstream bugfix release
+    - fix a potential format string vulnerability, which is not believed
+      to be exploitable in practice
+  * dbus.prerm: ensure that dbus.socket is stopped before removal,
+    so that a new connection to the bus won't cause dbus.service to be
+    restarted (Closes: #813970)
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 10 Oct 2016 11:42:50 +0100
+
 dbus (1.8.20-0+deb8u1) jessie; urgency=medium
 
   * New upstream bugfix release

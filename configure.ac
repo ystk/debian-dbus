@@ -3,7 +3,7 @@ AC_PREREQ([2.63])
 
 m4_define([dbus_major_version], [1])
 m4_define([dbus_minor_version], [8])
-m4_define([dbus_micro_version], [20])
+m4_define([dbus_micro_version], [22])
 m4_define([dbus_version],
           [dbus_major_version.dbus_minor_version.dbus_micro_version])
 AC_INIT([dbus],[dbus_version],[https://bugs.freedesktop.org/enter_bug.cgi?product=dbus],[dbus])
@@ -37,7 +37,7 @@ LT_CURRENT=11
 
 ## increment any time the source changes; set to
 ##  0 if you increment CURRENT
-LT_REVISION=13
+LT_REVISION=14
 
 ## increment if any interfaces have been added; set to 0
 ## if any interfaces have been changed or removed. removal has
@@ -1347,6 +1347,7 @@ TP_COMPILER_WARNINGS([WARNING_CFLAGS],
   dnl - type-limits is probably a bug too, but having the rest of -Wextra
   dnl   is better than nothing
   [$DISABLE_UNUSED_WARNINGS \
+   deprecated-declarations \
    missing-field-initializers \
    unused-parameter \
    sign-compare \
