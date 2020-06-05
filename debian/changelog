@@ -1,3 +1,12 @@
+dbus (1.8.22-0+deb8u3) jessie-security; urgency=high
+
+  * CVE-2020-12049: Prevent a file descriptor leak which can lead to denial of
+    service when the program runs out of file descriptors. An unprivileged
+    local attacker could use this to attack the system DBus daemon, leading to
+    denial of service for all users of the machine.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 05 Jun 2020 16:23:29 +0100
+
 dbus (1.8.22-0+deb8u2) jessie-security; urgency=medium
 
   * Non-maintainer upload by the LTS Team.
