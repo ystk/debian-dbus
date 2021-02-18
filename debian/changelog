@@ -1,3 +1,12 @@
+dbus (1.8.22-0+deb8u4) jessie-security; urgency=high
+
+  * Non-maintainer upload by the ELTS Team.
+  * CVE-2020-35512
+    Fix for a user-after-free that could have happened on a system having
+    multiple usernames sharing the same UID.
+
+ -- Thorsten Alteholz <debian@alteholz.de>  Tue, 27 Jan 2021 19:05:02 +0100
+
 dbus (1.8.22-0+deb8u3) jessie-security; urgency=high
 
   * CVE-2020-12049: Prevent a file descriptor leak which can lead to denial of

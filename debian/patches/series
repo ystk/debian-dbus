@@ -1,3 +1,5 @@
 01_no-fatal-warnings.patch
 CVE-2019-12749.patch
 CVE-2020-12049.patch
+
+CVE-2020-35512.patch
