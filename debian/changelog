@@ -1,3 +1,12 @@
+dbus (1.8.22-0+deb8u5) jessie-security; urgency=medium
+
+  * Non-maintainer upload by the ELTS Team.
+  * Fix several denial of service issues where an authenticated attacker
+    can crash the system bus by sending crafted messages
+    (CVE-2022-42010, CVE-2022-42011, CVE-2022-42012)
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Mon, 10 Oct 2022 13:24:05 +0200
+
 dbus (1.8.22-0+deb8u4) jessie-security; urgency=high
 
   * Non-maintainer upload by the ELTS Team.
